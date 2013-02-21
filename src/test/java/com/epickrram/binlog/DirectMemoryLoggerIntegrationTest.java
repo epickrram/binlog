@@ -38,7 +38,7 @@ import static org.junit.Assert.fail;
 public final class DirectMemoryLoggerIntegrationTest
 {
     private static final String FILENAME = System.getProperty("java.io.tmpdir") +
-            File.separator + System.getProperty("user.name");
+            File.separator + System.getProperty("user.name") + "-" + System.currentTimeMillis();
 
     private static final int ONE_KILOBYTE = 1024;
     private static final char ASCII_CHAR = 'h';
@@ -61,7 +61,6 @@ public final class DirectMemoryLoggerIntegrationTest
         byteArrayOffset = unsafe.arrayBaseOffset(byte[].class);
     }
 
-    @Ignore
     @Test
     public void shouldCompile() throws Exception
     {

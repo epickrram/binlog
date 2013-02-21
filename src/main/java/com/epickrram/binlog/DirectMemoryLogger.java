@@ -46,7 +46,7 @@ public final class DirectMemoryLogger
     {
         file = new RandomAccessFile(filename, "rw");
         final FileChannel fileChannel = file.getChannel();
-        buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bufferLength).load();
+        buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bufferLength);
 
         final Field address = Buffer.class.getDeclaredField("address");
         unsafe = UnsafeUtil.getUnsafe();

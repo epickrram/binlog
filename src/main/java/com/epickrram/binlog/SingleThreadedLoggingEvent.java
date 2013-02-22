@@ -35,6 +35,7 @@ public final class SingleThreadedLoggingEvent implements LoggingEvent
     public LoggingEvent begin(final LogCategory logCategory)
     {
         length = 0;
+        capacityAllocator.reset();
         logger.writeIntAt(capacityAllocator.getAllocatedBlockAddress(DirectMemoryLogger.SIZE_OF_INT), logCategory.getCategoryId());
         lengthFieldPosition = capacityAllocator.getAllocatedBlockAddress(DirectMemoryLogger.SIZE_OF_INT);
         return this;

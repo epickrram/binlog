@@ -21,4 +21,5 @@ public interface LoggingCapacityAllocator
 {
     long getAllocatedBlockAddress(final long requiredCapacity);
     void onNewFile();
+    void reset();
 }

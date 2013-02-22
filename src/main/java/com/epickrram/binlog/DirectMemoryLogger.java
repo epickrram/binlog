@@ -23,9 +23,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+
+import static java.lang.String.format;
 
 public final class DirectMemoryLogger
 {
@@ -33,6 +34,7 @@ public final class DirectMemoryLogger
     public static final int SIZE_OF_FLOAT = 4;
     public static final int SIZE_OF_LONG = 8;
     public static final int SIZE_OF_INT = 4;
+    public static final int SIZE_OF_BYTE = 1;
 
     private final long bufferAddress;
     private final int pageSize;
@@ -40,6 +42,7 @@ public final class DirectMemoryLogger
     private final long dataOffset;
     private final MappedByteBuffer buffer;
     private final RandomAccessFile file;
+    private final long bufferLength;
 
     public DirectMemoryLogger(final String filename, final long bufferLength)
             throws IOException, NoSuchFieldException, IllegalAccessException
@@ -54,6 +57,7 @@ public final class DirectMemoryLogger
         bufferAddress = unsafe.getLong(buffer, addressFieldOffset);
         pageSize = unsafe.pageSize();
         dataOffset = getDataOffset(mappingOffset());
+        this.bufferLength = bufferLength;
     }
 
     public DirectMemoryLogger writeAsciiCharAt(final long position, final char value)
@@ -63,6 +67,8 @@ public final class DirectMemoryLogger
 
     public DirectMemoryLogger writeByteAt(final long position, final byte value)
     {
+        assert boundsCheck(position, SIZE_OF_BYTE) : format("Tried to write byte at %d, buffer length is %d", position, bufferLength);
+
         unsafe.putByte(getPointer(position), value);
 
         return this;
@@ -70,6 +76,8 @@ public final class DirectMemoryLogger
 
     public DirectMemoryLogger writeDoubleAt(final long position, final double value)
     {
+        assert boundsCheck(position, SIZE_OF_DOUBLE) : format("Tried to write double at %d, buffer length is %d", position, bufferLength);
+
         unsafe.putDouble(getPointer(position), value);
 
         return this;
@@ -77,6 +85,8 @@ public final class DirectMemoryLogger
 
     public DirectMemoryLogger writeFloatAt(final long position, final float value)
     {
+        assert boundsCheck(position, SIZE_OF_FLOAT) : format("Tried to write float at %d, buffer length is %d", position, bufferLength);
+
         unsafe.putFloat(getPointer(position), value);
 
         return this;
@@ -84,14 +94,17 @@ public final class DirectMemoryLogger
 
     public DirectMemoryLogger writeIntAt(final long position, final int value)
     {
-        final long pointer = getPointer(position);
-        unsafe.putInt(pointer, value);
+        assert boundsCheck(position, SIZE_OF_INT) : format("Tried to write int at %d, buffer length is %d", position, bufferLength);
+
+        unsafe.putInt(getPointer(position), value);
 
         return this;
     }
 
     public DirectMemoryLogger writeLongAt(final long position, final long value)
     {
+        assert boundsCheck(position, SIZE_OF_LONG) : format("Tried to write long at %d, buffer length is %d", position, bufferLength);
+
         unsafe.putLong(getPointer(position), value);
 
         return this;
@@ -117,6 +130,11 @@ public final class DirectMemoryLogger
     public void close() throws IOException
     {
         file.close();
+    }
+
+    private boolean boundsCheck(final long position, final int sizeOfDataItem)
+    {
+        return position < bufferLength - sizeOfDataItem;
     }
 
     private long getPointer(final long position)

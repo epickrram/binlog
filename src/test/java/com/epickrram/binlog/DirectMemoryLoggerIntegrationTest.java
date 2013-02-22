@@ -67,7 +67,7 @@ public final class DirectMemoryLoggerIntegrationTest
         System.out.println(String.format("Start of test, mem free: %d/%d",
                 Runtime.getRuntime().freeMemory(), Runtime.getRuntime().totalMemory()));
         final int fileSize = 1024 * 1024 * 1024;
-        logger = new DirectMemoryLogger(FILENAME, fileSize);
+        logger = new DirectMemoryLogger(FILENAME + "-1", fileSize);
 
         LoggingService loggingService = new LoggingService(logger);
         LoggingEvent loggingEvent = loggingService.singleThreadedAccess().begin(TestLogCategory.ONE);
@@ -76,8 +76,9 @@ public final class DirectMemoryLoggerIntegrationTest
         System.out.println(String.format("Logger created, mem free: %d/%d",
                 Runtime.getRuntime().freeMemory(), Runtime.getRuntime().totalMemory()));
 
-        final int intCount = (fileSize - 1024) / DirectMemoryLogger.SIZE_OF_INT;
-        final int longCount = (fileSize - 4096) / DirectMemoryLogger.SIZE_OF_LONG;
+        final int intCount = (fileSize / 2 - 8192) / DirectMemoryLogger.SIZE_OF_INT;
+        final int longCount = (fileSize / 2 - 8192) / DirectMemoryLogger.SIZE_OF_LONG;
+
 
         System.out.println(intCount);
         System.out.println(longCount);
@@ -88,22 +89,22 @@ public final class DirectMemoryLoggerIntegrationTest
         start = System.nanoTime();
         for(int i = 0; i < longCount; i++)
         {
-            if(i % 100000 == 0)
-            {
-                System.out.println(i);
-            }
+//            if(i % 100000 == 0)
+//            {
+//                System.out.println(i);
+//            }
             loggingEvent.appendLong(i);
         }
         loggingEvent.commit();
         log(longCount, start, "long");
 
-//        start = System.nanoTime();
-//        for(int i = 0; i < intCount; i++)
-//        {
-//            loggingEvent.appendInt(i);
-//        }
-//        loggingEvent.commit();
-//        log(intCount, start, "int");
+        start = System.nanoTime();
+        for(int i = 0; i < intCount; i++)
+        {
+            loggingEvent.appendInt(i);
+        }
+        loggingEvent.commit();
+        log(intCount, start, "int");
 
 
 
@@ -116,7 +117,7 @@ public final class DirectMemoryLoggerIntegrationTest
 
         System.out.println(String.format("Logger closed, mem free: %d/%d",
                 Runtime.getRuntime().freeMemory(), Runtime.getRuntime().totalMemory()));
-        if(!new File(FILENAME).delete())
+        if(!new File(FILENAME + "-1").delete())
         {
             System.out.println("FAILED to delete file");
         }
@@ -125,21 +126,21 @@ public final class DirectMemoryLoggerIntegrationTest
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(5L));
 
         System.out.println(String.format("Deleted file at %s", new Date()));
-        logger = new DirectMemoryLogger(FILENAME, fileSize);
+        logger = new DirectMemoryLogger(FILENAME + "-2", fileSize);
         loggingService = new LoggingService(logger);
         loggingEvent = loggingService.singleThreadedAccess().begin(TestLogCategory.ONE);
 
-//        start = System.nanoTime();
-//        for(int i = 0; i < longCount; i++)
-//        {
-//            if(i % 100000 == 0)
-//            {
-//                System.out.println(i);
-//            }
-//            loggingEvent.appendLong(i);
-//        }
-//        loggingEvent.commit();
-//        log(longCount, start, "long");
+        start = System.nanoTime();
+        for(int i = 0; i < longCount; i++)
+        {
+            if(i % 100000 == 0)
+            {
+                System.out.println(i);
+            }
+            loggingEvent.appendLong(i);
+        }
+        loggingEvent.commit();
+        log(longCount, start, "long");
 
         start = System.nanoTime();
         for(int i = 0; i < intCount; i++)

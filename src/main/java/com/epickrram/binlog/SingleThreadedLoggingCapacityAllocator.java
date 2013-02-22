@@ -32,6 +32,12 @@ public final class SingleThreadedLoggingCapacityAllocator implements LoggingCapa
     @Override
     public void onNewFile()
     {
+        reset();
+    }
+
+    @Override
+    public void reset()
+    {
         position = 0L;
     }
 }

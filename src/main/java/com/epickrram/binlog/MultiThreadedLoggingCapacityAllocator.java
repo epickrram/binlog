@@ -40,6 +40,12 @@ public final class MultiThreadedLoggingCapacityAllocator implements LoggingCapac
     @Override
     public void onNewFile()
     {
+        reset();
+    }
+
+    @Override
+    public void reset()
+    {
         position.set(0L);
     }
 }

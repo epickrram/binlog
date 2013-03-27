@@ -61,8 +61,9 @@ public final class DirectMemoryLoggerIntegrationTest
         byteArrayOffset = unsafe.arrayBaseOffset(byte[].class);
     }
 
+    @Ignore
     @Test
-    public void shouldCompile() throws Exception
+    public void perftest() throws Exception
     {
         System.out.println(String.format("Start of test, mem free: %d/%d",
                 Runtime.getRuntime().freeMemory(), Runtime.getRuntime().totalMemory()));

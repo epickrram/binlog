@@ -1,5 +1,3 @@
-package com.epickrram.binlog;
-
 //////////////////////////////////////////////////////////////////////////////////
 //   Copyright 2011   Mark Price     mark at epickrram.com                      //
 //                                                                              //
@@ -17,36 +15,26 @@ package com.epickrram.binlog;
 //////////////////////////////////////////////////////////////////////////////////
 
 
-public final class LoggingService
+package com.epickrram.binlog;
+
+import java.io.File;
+import java.nio.MappedByteBuffer;
+
+public final class SequentialRandomAccessFileBufferAllocator implements BufferAllocator
 {
-    private ThreadLocal<SingleThreadedLoggingEvent> singleThreadedEvent =
-            new ThreadLocal<SingleThreadedLoggingEvent>();
-    private ThreadLocal<LoggingEvent> multiThreadedEvent = new ThreadLocal<LoggingEvent>();
+    private final String basename;
+    private final File dataDirectory;
 
-    private final DirectMemoryLogger logger;
-
-    public LoggingService(final DirectMemoryLogger logger)
+    public SequentialRandomAccessFileBufferAllocator(final String basename,
+                                                     final File dataDirectory)
     {
-        this.logger = logger;
+        this.basename = basename;
+        this.dataDirectory = dataDirectory;
     }
 
-    public LoggingEvent singleThreadedAccess()
+    @Override
+    public MappedByteBuffer next()
     {
-        if(singleThreadedEvent.get() == null)
-        {
-            singleThreadedEvent.set(new SingleThreadedLoggingEvent(logger, new SingleThreadedLoggingCapacityAllocator()));
-        }
-
-        return singleThreadedEvent.get();
-    }
-
-    public LoggingEvent multiThreadedAccess()
-    {
-        if(multiThreadedEvent.get() == null)
-        {
-            multiThreadedEvent.set(new MultiThreadedLoggingEvent(logger, new MultiThreadedLoggingCapacityAllocator()));
-        }
-
-        return multiThreadedEvent.get();
+        return null;
     }
 }

@@ -1,5 +1,3 @@
-package com.epickrram.binlog;
-
 //////////////////////////////////////////////////////////////////////////////////
 //   Copyright 2011   Mark Price     mark at epickrram.com                      //
 //                                                                              //
@@ -17,36 +15,35 @@ package com.epickrram.binlog;
 //////////////////////////////////////////////////////////////////////////////////
 
 
-public final class LoggingService
+package com.epickrram.binlog;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+
+public final class SequentialRandomAccessFileBufferAllocatorTest
 {
-    private ThreadLocal<SingleThreadedLoggingEvent> singleThreadedEvent =
-            new ThreadLocal<SingleThreadedLoggingEvent>();
-    private ThreadLocal<LoggingEvent> multiThreadedEvent = new ThreadLocal<LoggingEvent>();
+    private static final String BASENAME = "srafb-test";
+    private SequentialRandomAccessFileBufferAllocator allocator;
 
-    private final DirectMemoryLogger logger;
-
-    public LoggingService(final DirectMemoryLogger logger)
+    @Before
+    public void before() throws Exception
     {
-        this.logger = logger;
+        allocator = new SequentialRandomAccessFileBufferAllocator(BASENAME, createTestDirectory());
     }
 
-    public LoggingEvent singleThreadedAccess()
+    @Test
+    public void shouldReturnDifferentBuffersOnSequentialCalls() throws Exception
     {
-        if(singleThreadedEvent.get() == null)
-        {
-            singleThreadedEvent.set(new SingleThreadedLoggingEvent(logger, new SingleThreadedLoggingCapacityAllocator()));
-        }
 
-        return singleThreadedEvent.get();
     }
 
-    public LoggingEvent multiThreadedAccess()
+    private static File createTestDirectory()
     {
-        if(multiThreadedEvent.get() == null)
-        {
-            multiThreadedEvent.set(new MultiThreadedLoggingEvent(logger, new MultiThreadedLoggingCapacityAllocator()));
-        }
-
-        return multiThreadedEvent.get();
+        final File dataDir = new File(System.getProperty("java.io.tmpdir") + File.separator +
+                System.getProperty("user.name") + File.separator + BASENAME);
+        dataDir.mkdirs();
+        return dataDir;
     }
 }

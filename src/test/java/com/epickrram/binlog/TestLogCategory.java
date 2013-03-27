@@ -25,7 +25,8 @@ import java.util.Date;
 public enum TestLogCategory implements BinaryLogRecordHandler
 {
     ONE(1),
-    TWO(2);
+    TWO(2),
+    THREE(3);
 
     public static final String CATEGORY_ONE_FORMAT = "Timestamp [%s], count: %d, chars: %s, %s";
     public static final String CATEGORY_TWO_FORMAT = "Timestamp [%s], a: %.3f, b: %.3f, c: %.3f";
@@ -53,6 +54,10 @@ public enum TestLogCategory implements BinaryLogRecordHandler
         else if(TWO == this)
         {
             return formatCategoryTwo(unsafeEncodedLogRecord, UnsafeUtil.getUnsafe(), UnsafeUtil.getByteArrayBaseOffset());
+        }
+        else if(THREE == this)
+        {
+            return formatCategoryThree(unsafeEncodedLogRecord, UnsafeUtil.getUnsafe(), UnsafeUtil.getByteArrayBaseOffset());
         }
         throw new IllegalArgumentException(String.format("Don't know how to deserialise category %s", this));
     }
@@ -86,5 +91,11 @@ public enum TestLogCategory implements BinaryLogRecordHandler
         offset += DirectMemoryLogger.SIZE_OF_FLOAT;
 
         return String.format(CATEGORY_TWO_FORMAT, new Date(timestamp), f1, f2, f3);
+    }
+
+    private String formatCategoryThree(final byte[] unsafeEncodedLogRecord, final Unsafe unsafe, final long byteArrayBaseOffset)
+    {
+        final int value = unsafe.getInt(unsafeEncodedLogRecord, byteArrayBaseOffset);
+        return Integer.toString(value);
     }
 }

@@ -1,5 +1,3 @@
-package com.epickrram.binlog;
-
 //////////////////////////////////////////////////////////////////////////////////
 //   Copyright 2011   Mark Price     mark at epickrram.com                      //
 //                                                                              //
@@ -17,36 +15,11 @@ package com.epickrram.binlog;
 //////////////////////////////////////////////////////////////////////////////////
 
 
-public final class LoggingService
+package com.epickrram.binlog;
+
+import java.nio.MappedByteBuffer;
+
+public interface BufferAllocator
 {
-    private ThreadLocal<SingleThreadedLoggingEvent> singleThreadedEvent =
-            new ThreadLocal<SingleThreadedLoggingEvent>();
-    private ThreadLocal<LoggingEvent> multiThreadedEvent = new ThreadLocal<LoggingEvent>();
-
-    private final DirectMemoryLogger logger;
-
-    public LoggingService(final DirectMemoryLogger logger)
-    {
-        this.logger = logger;
-    }
-
-    public LoggingEvent singleThreadedAccess()
-    {
-        if(singleThreadedEvent.get() == null)
-        {
-            singleThreadedEvent.set(new SingleThreadedLoggingEvent(logger, new SingleThreadedLoggingCapacityAllocator()));
-        }
-
-        return singleThreadedEvent.get();
-    }
-
-    public LoggingEvent multiThreadedAccess()
-    {
-        if(multiThreadedEvent.get() == null)
-        {
-            multiThreadedEvent.set(new MultiThreadedLoggingEvent(logger, new MultiThreadedLoggingCapacityAllocator()));
-        }
-
-        return multiThreadedEvent.get();
-    }
+    MappedByteBuffer next();
 }
